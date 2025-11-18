@@ -53,7 +53,7 @@ mode: null
 ## CLI commands (v0)
 
 ### 1. `rcodex init`
-**Purpose:** Initialize a new RCodex project in the current directory.
+**Purpose:** Initialize a new RCodex project in the current directory
 
 **Behavior:**
 
