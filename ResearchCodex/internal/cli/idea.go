@@ -22,19 +22,20 @@ import (
 func newIdeaCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "idea",
-		Short: "Work with ideas inside the current project",
+		Short: "Work with scopes inside the current project",
 	}
-	cmd.AddCommand(newIdeaCreateCommand(), newIdeaStatusCommand())
+	cmd.AddCommand(newIdeaNewCommand(), newIdeaStatusCommand())
 	return cmd
 }
 
-func newIdeaCreateCommand() *cobra.Command {
+func newIdeaNewCommand() *cobra.Command {
 	var body string
 	var dependsOn string
 	cmd := &cobra.Command{
-		Use:   "create <title>",
-		Short: "Create a new idea under the current project",
-		Args:  cobra.ExactArgs(1),
+		Use:     "new <title>",
+		Short:   "Create a new scope under the current project",
+		Aliases: []string{"create"},
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			title := args[0]
 			ws, err := workspace.Detect()
@@ -84,16 +85,16 @@ func newIdeaCreateCommand() *cobra.Command {
 			}
 
 			cfg.SetCurrentIdea(relIdeaPath)
-			cfg.SetMode("plan")
+			cfg.SetMode("scope")
 			if err := config.Save(ws.ConfigPath(), cfg); err != nil {
 				return err
 			}
 
-			fmt.Fprintf(cmd.OutOrStdout(), "Created idea %s\n", relIdeaPath)
+			fmt.Fprintf(cmd.OutOrStdout(), "Created scope %s\n", relIdeaPath)
 			return nil
 		},
 	}
-	cmd.Flags().StringVar(&body, "body", "", "Idea body text")
+	cmd.Flags().StringVar(&body, "body", "", "Scope body text")
 	cmd.Flags().StringVar(&dependsOn, "depends-on", "", "Slug or path for dependency (use 'none' for a base idea)")
 	return cmd
 }
@@ -160,7 +161,7 @@ func resolveIdeaPath(ws *workspace.Workspace, project, input string) (string, er
 func newIdeaStatusCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "status",
-		Short: "Show the current idea details and dependency chain",
+		Short: "Show the current scope details and dependency chain",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ws, err := workspace.Detect()
 			if err != nil {
@@ -172,7 +173,7 @@ func newIdeaStatusCommand() *cobra.Command {
 			}
 			ideaPath := cfg.GetCurrentIdea()
 			if ideaPath == "" {
-				return errors.New("no current idea selected. create or select an idea first")
+				return errors.New("no current scope selected. create or select a scope first")
 			}
 
 			absIdea := ws.Abs(ideaPath)
@@ -193,7 +194,7 @@ func newIdeaStatusCommand() *cobra.Command {
 			chain := ideas.ResolveChain(deps, ideaPath)
 
 			out := cmd.OutOrStdout()
-			fmt.Fprintf(out, "Idea: %s\n", titleOrFallback(title, ideaPath))
+			fmt.Fprintf(out, "Scope: %s\n", titleOrFallback(title, ideaPath))
 			fmt.Fprintf(out, "Project: %s\n", projectOrFallback(project))
 			fmt.Fprintf(out, "Created: %s\n", created)
 			fmt.Fprintf(out, "Path: %s\n", ideaPath)

@@ -19,6 +19,16 @@ func newPlanCommand() *cobra.Command {
 	}
 }
 
+func newScopeModeCommand() *cobra.Command {
+	return &cobra.Command{
+		Use:   "scope",
+		Short: "Switch to SCOPE mode",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return setMode(cmd, "scope")
+		},
+	}
+}
+
 func newCodeCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:   "code",

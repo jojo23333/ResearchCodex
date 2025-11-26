@@ -45,11 +45,16 @@ export PATH="$HOME/.local/bin:$PATH"
 # Initialize a workspace (run once per repository)
 rcodex init
 
-# Create your first project; this sets the active project/idea
-rcodex project create my-research-topic
+# Create your first project; this sets the active project/scope
+rcodex project new my-research-topic
 
-# Add more ideas as you refine the research thread
-rcodex idea create "Better contrastive loss" --body "Try temperature annealing on video-text pairs."
+# Switch phases as you refine the work
+rcodex scope    # scoping formation (idea.md structure)
+rcodex plan     # implementation planning (plans.md)
+rcodex code     # implementation/execution
+
+# Add more scopes as you refine the research thread
+rcodex idea new "Better contrastive loss" --body "Try temperature annealing on video-text pairs."
 
 # Inspect context and mode
 rcodex status

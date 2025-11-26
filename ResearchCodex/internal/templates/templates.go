@@ -6,13 +6,14 @@ import (
 	"strings"
 )
 
-//go:embed CodeModeAgents.md PlanModeAgents.md RootAgents.md
+//go:embed CodeModeAgents.md PlanModeAgents.md RootAgents.md ScopeModeAgents.md
 var templateFS embed.FS
 
 var (
-	planModeAgents = mustReadTemplate("PlanModeAgents.md")
-	codeModeAgents = mustReadTemplate("CodeModeAgents.md")
-	rootAgents     = mustReadTemplate("RootAgents.md")
+	planModeAgents  = mustReadTemplate("PlanModeAgents.md")
+	codeModeAgents  = mustReadTemplate("CodeModeAgents.md")
+	rootAgents      = mustReadTemplate("RootAgents.md")
+	scopeModeAgents = mustReadTemplate("ScopeModeAgents.md")
 )
 
 func mustReadTemplate(path string) string {
@@ -29,6 +30,8 @@ func CodeModeAgentsMarkdown() string { return codeModeAgents }
 
 func RootAgentsMarkdown() string { return rootAgents }
 
+func ScopeModeAgentsMarkdown() string { return scopeModeAgents }
+
 const DefaultProjectAgents = `# Project Agents
 
 - Planner: refresh context by reading projects/<project>/ideas
@@ -36,20 +39,30 @@ const DefaultProjectAgents = `# Project Agents
 - Analyst: interprets experiment results and records outcomes
 `
 
-// IdeaMarkdown builds the canonical content for idea.md.
+// IdeaMarkdown builds the canonical content for idea.md (scoping phase).
 func IdeaMarkdown(title, createdAt, body string) string {
 	body = strings.TrimSpace(body)
 	if body == "" {
-		body = "(fill this in with hypothesis, questions, and outline)"
+		body = "(fill this with the human-provided idea and constraints)"
 	}
+
+	aiSection := "- Flesh out datasets, models, evaluation plan, and risks.\n- Replace this list with the structured AI-elaborated scope."
 
 	return fmt.Sprintf(`# %s
 
 Created: %s
 
-Body:
+## Original Scope
 %s
-`, title, createdAt, body)
+
+## AI-Elaborated Scope
+%s
+
+***********************
+> - <Clarification Question>
+> [ ] Human Response: TODO
+************************
+`, title, createdAt, body, aiSection)
 }
 
 // PlansMarkdown returns the scaffold for plans.md.

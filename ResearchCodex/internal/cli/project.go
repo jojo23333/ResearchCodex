@@ -11,6 +11,7 @@ import (
 	"github.com/jojo/ResearchCodex/internal/filesystem"
 	"github.com/jojo/ResearchCodex/internal/ideas"
 	"github.com/jojo/ResearchCodex/internal/templates"
+	"github.com/jojo/ResearchCodex/internal/textutil"
 	"github.com/jojo/ResearchCodex/internal/timeutil"
 	"github.com/jojo/ResearchCodex/internal/workspace"
 	"github.com/spf13/cobra"
@@ -21,15 +22,16 @@ func newProjectCommand() *cobra.Command {
 		Use:   "project",
 		Short: "Manage ResearchCodex projects",
 	}
-	cmd.AddCommand(newProjectCreateCommand(), newProjectSwitchCommand())
+	cmd.AddCommand(newProjectNewCommand(), newProjectSwitchCommand())
 	return cmd
 }
 
-func newProjectCreateCommand() *cobra.Command {
+func newProjectNewCommand() *cobra.Command {
 	return &cobra.Command{
-		Use:   "create <name>",
-		Short: "Create a new research project",
-		Args:  cobra.ExactArgs(1),
+		Use:     "new <name>",
+		Short:   "Create a new research project",
+		Aliases: []string{"create"},
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name := args[0]
 			if name == "" {
@@ -65,13 +67,13 @@ func newProjectCreateCommand() *cobra.Command {
 				return err
 			}
 
-			slugPart, createdAt := createBaseIdeaSlug()
+			slugPart, createdAt := createBaseIdeaSlug(name)
 			ideaDir := ws.ProjectIdeaDir(name, slugPart)
 			if err := filesystem.EnsureDir(ideaDir); err != nil {
 				return err
 			}
 
-			ideaContent := templates.IdeaMarkdown("base", createdAt, "")
+			ideaContent := templates.IdeaMarkdown(name, createdAt, "")
 			if err := filesystem.WriteFile(filepath.Join(ideaDir, "idea.md"), []byte(ideaContent)); err != nil {
 				return err
 			}
@@ -100,12 +102,12 @@ func newProjectCreateCommand() *cobra.Command {
 			}
 			cfg.SetCurrentProject(name)
 			cfg.SetCurrentIdea(relIdeaPath)
-			cfg.SetMode("plan")
+			cfg.SetMode("scope")
 			if err := config.Save(ws.ConfigPath(), cfg); err != nil {
 				return err
 			}
 
-			fmt.Fprintf(cmd.OutOrStdout(), "Created project %q with base idea %s\n", name, relIdeaPath)
+			fmt.Fprintf(cmd.OutOrStdout(), "Created project %q with base scope %s\n", name, relIdeaPath)
 			return nil
 		},
 	}
@@ -146,7 +148,7 @@ func newProjectSwitchCommand() *cobra.Command {
 	}
 }
 
-func createBaseIdeaSlug() (slug string, createdAt string) {
+func createBaseIdeaSlug(projectName string) (slug string, createdAt string) {
 	now := time.Now().UTC()
-	return fmt.Sprintf("%s_base", timeutil.TimestampSlug(now)), timeutil.ISO8601(now)
+	return fmt.Sprintf("%s_%s", timeutil.TimestampSlug(now), textutil.Slugify(projectName)), timeutil.ISO8601(now)
 }

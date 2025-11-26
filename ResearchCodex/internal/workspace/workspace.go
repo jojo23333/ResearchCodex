@@ -39,6 +39,10 @@ func (w *Workspace) CodeAgentsPath() string {
 	return filepath.Join(w.RCodexDir(), ".code_mode_agents.md")
 }
 
+func (w *Workspace) ScopeAgentsPath() string {
+	return filepath.Join(w.RCodexDir(), ".scope_mode_agents.md")
+}
+
 func (w *Workspace) ProjectsDir() string {
 	return filepath.Join(w.Root, "projects")
 }

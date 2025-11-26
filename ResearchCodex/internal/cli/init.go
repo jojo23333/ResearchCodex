@@ -44,6 +44,9 @@ func newInitCommand() *cobra.Command {
 			if err := filesystem.WriteFile(ws.CodeAgentsPath(), []byte(templates.CodeModeAgentsMarkdown())); err != nil {
 				return err
 			}
+			if err := filesystem.WriteFile(ws.ScopeAgentsPath(), []byte(templates.ScopeModeAgentsMarkdown())); err != nil {
+				return err
+			}
 			if err := filesystem.WriteFile(ws.IdeaDepsPath(), []byte{}); err != nil {
 				return err
 			}

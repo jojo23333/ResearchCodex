@@ -17,6 +17,7 @@ func NewRootCommand() *cobra.Command {
 		newProjectCommand(),
 		newIdeaCommand(),
 		newStatusCommand(),
+		newScopeModeCommand(),
 		newPlanCommand(),
 		newCodeCommand(),
 	)
